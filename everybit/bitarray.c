@@ -65,17 +65,7 @@ static void bitarray_rotate_left(bitarray_t* const bitarray,
                                  const size_t bit_length,
                                  const size_t bit_left_amount);
 
-// Rotates a subarray left by one bit.
-//
-// bit_offset is the index of the start of the subarray
-// bit_length is the length of the subarray, in bits
-//
-// The subarray spans the half-open interval
-// [bit_offset, bit_offset + bit_length)
-// That is, the start is inclusive, but the end is exclusive.
-static void bitarray_rotate_left_one(bitarray_t* const bitarray,
-                                     const size_t bit_offset,
-                                     const size_t bit_length);
+static size_t gcd(const size_t a, const size_t b);
 
 // Portable modulo operation that supports negative dividends.
 //
@@ -201,22 +191,37 @@ static void bitarray_rotate_left(bitarray_t* const bitarray,
                                  const size_t bit_offset,
                                  const size_t bit_length,
                                  const size_t bit_left_amount) {
-  for (size_t i = 0; i < bit_left_amount; i++) {
-    bitarray_rotate_left_one(bitarray, bit_offset, bit_length);
+  if (bit_length <= 1) {
+    return;
   }
-}
 
-static void bitarray_rotate_left_one(bitarray_t* const bitarray,
-                                     const size_t bit_offset,
-                                     const size_t bit_length) {
-  // Grab the first bit in the range, shift everything left by one, and
-  // then stick the first bit at the end.
-  const bool first_bit = bitarray_get(bitarray, bit_offset);
-  size_t i;
-  for (i = bit_offset; i + 1 < bit_offset + bit_length; i++) {
-    bitarray_set(bitarray, i, bitarray_get(bitarray, i + 1));
+  const size_t left_amount = bit_left_amount % bit_length;
+  if (left_amount == 0) {
+    return;
   }
-  bitarray_set(bitarray, i, first_bit);
+
+  const size_t cycle_count = gcd(bit_length, left_amount);
+  for (size_t cycle = 0; cycle < cycle_count; cycle++) {
+    size_t from = cycle;
+    const bool saved = bitarray_get(bitarray, bit_offset + cycle);
+
+    while (true) {
+      size_t to = from + left_amount;
+      if (to >= bit_length) {
+        to -= bit_length;
+      }
+
+      if (to == cycle) {
+        break;
+      }
+
+      bitarray_set(bitarray, bit_offset + from,
+                   bitarray_get(bitarray, bit_offset + to));
+      from = to;
+    }
+
+    bitarray_set(bitarray, bit_offset + from, saved);
+  }
 }
 
 static size_t modulo(const ssize_t n, const size_t m) {
@@ -225,6 +230,17 @@ static size_t modulo(const ssize_t n, const size_t m) {
   const ssize_t result = ((n % signed_m) + signed_m) % signed_m;
   assert(result >= 0);
   return (size_t)result;
+}
+
+static size_t gcd(const size_t a, const size_t b) {
+  size_t x = a;
+  size_t y = b;
+  while (y != 0) {
+    const size_t r = x % y;
+    x = y;
+    y = r;
+  }
+  return x;
 }
 
 static char bitmask(const size_t bit_index) {
