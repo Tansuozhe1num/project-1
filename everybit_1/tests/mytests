@@ -1,0 +1,183 @@
+# Copyright (c) 2012 MIT License by 6.172 Staff
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
+
+# Instructions for writing a test:
+#
+# t: initializes new test
+# n: initializes bit array
+# r: rotates bit array subset at offset, length by amount
+# e: expects raw bit array value
+
+# Ex:
+# t 0
+# 
+# n 10010110
+# r 0 8 -1
+# e 00101101
+
+# Place your 20 test cases below, here.
+# ==========================================
+# 边界极限测试 (Boundary & Edge Cases)
+# ==========================================
+
+# 3: Zero length (长度为0，数组不应发生任何改变)
+t 3
+n 11001100
+r 2 0 5
+e 11001100
+
+# 4: Zero shift amount (旋转步数为0，不应改变)
+t 4
+n 10101010
+r 0 8 0
+e 10101010
+
+# 5: Shift exactly equal to length (右旋步数等于长度，等同于不转)
+t 5
+n 11110000
+r 0 8 8
+e 11110000
+
+# 6: Negative shift exactly equal to length (左旋步数等于长度，等同于不转)
+t 6
+n 00001111
+r 0 8 -8
+e 00001111
+
+# 7: Shift amount is a large multiple of length (大倍数取模，16 % 8 = 0)
+t 7
+n 10000001
+r 0 8 16
+e 10000001
+
+# 8: Subset length is 1 (子数组长度仅为1，无论怎么转都不变)
+t 8
+n 01010101
+r 3 1 5
+e 01010101
+
+# ==========================================
+# 局部子数组偏移测试 (Subset Offset Cases)
+# ==========================================
+
+# 9: Subset strictly at the beginning (仅旋转头部)
+t 9
+n 10001111
+r 0 4 1
+e 01001111
+
+# 10: Subset strictly at the end (仅旋转尾部，负数左旋)
+t 10
+n 11110001
+r 4 4 -1
+e 11110010
+
+# 11: Subset in the exact middle crossing byte boundary (跨越字节边界的中间旋转)
+t 11
+n 1111100000011111
+r 4 8 2
+e 1111011000001111
+
+# ==========================================
+# 复杂的取模与不对称测试 (Modulo & Asymmetric)
+# ==========================================
+
+# 12: Positive shift larger than length (正数大步数截断：5 % 4 = 1)
+t 12
+n 10101010
+r 2 4 5
+e 10010110
+
+# 13: Negative shift larger than length (负数大步数截断：-7 左旋等同于右旋 1 步)
+t 13
+n 11001100
+r 0 4 -7
+e 01101100
+
+# 14: Shift by length minus one right (右移 长度-1，等同于左移 1 步)
+t 14
+n 10000000
+r 0 8 7
+e 00000001
+
+# 15: Shift by length minus one left (左移 长度-1，等同于右移 1 步)
+t 15
+n 00000001
+r 0 8 -7
+e 10000000
+
+# 16: Asymmetric split (奇数长度的非对称旋转)
+t 16
+n 11100001
+r 0 7 3
+e 00011101
+
+# 17: Non-byte aligned offset and length (极其刁钻的非字节对齐切片)
+t 17
+n 11011011
+r 1 6 -2
+e 11101101
+
+# ==========================================
+# 特殊位模式 (Special Bit Patterns)
+# ==========================================
+
+# 18: All 1s (全1防呆测试)
+t 18
+n 11111111
+r 2 4 -3
+e 11111111
+
+# 19: All 0s (全0防呆测试)
+t 19
+n 00000000
+r 1 6 2
+e 00000000
+
+# ==========================================
+# 复合与长数据测试 (Consecutive & Long Data)
+# ==========================================
+
+# 20: Large bit array across 3 bytes (24 bits) 
+# t 20
+# n 111100001010101000001111
+# r 4 16 4
+# e 111100000000101010101111
+
+# 21: Consecutive crazy operations on the same array (同一数组的疯狂连招)
+t 21
+n 10010110
+r 0 8 1
+e 01001011
+r 2 4 -1
+e 01010011
+r 0 8 0
+e 01010011
+r 0 4 8
+e 01010011
+
+# 22: Very large shift on whole block (超大数值取模测试)
+t 22
+n 10000000
+r 0 8 100001
+e 01000000
+
+
