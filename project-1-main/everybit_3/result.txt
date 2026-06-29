@@ -1,0 +1,43 @@
+运行目录: /mnt/d/rubbish/project-1/project-1/everybit
+执行命令:
+1) ./everybit -t tests/default
+2) ./everybit -t tests/mytests
+3) ./everybit -s
+4) ./everybit -m
+5) ./everybit -l
+
+运行结果摘要:
+- tests/default: 全部 PASS
+- tests/mytests: t0 ~ t26 全部 PASS
+- 性能分层:
+  - -s: Succesfully completed tier: 28
+  - -m: Succesfully completed tier: 33
+  - -l: Succesfully completed tier: 35
+
+关键输出片段:
+[default]
+ --> tests/default at line 34: PASS
+ --> tests/default at line 41: PASS
+ --> tests/default at line 49: PASS
+ --> tests/default at line 52: PASS
+ --> tests/default at line 55: PASS
+ --> tests/default at line 58: PASS
+ --> tests/default at line 61: PASS
+
+[mytests]
+ --> tests/mytests at line 39: PASS
+ --> tests/mytests at line 44: PASS
+ --> tests/mytests at line 49: PASS
+ ...
+ --> tests/mytests at line 164: PASS
+ --> tests/mytests at line 169: PASS
+
+[性能]
+Tier 29 exceeded 0.01s cutoff with time 0.012281s
+Succesfully completed tier: 28
+
+Tier 34 exceeded 0.10s cutoff with time 0.175256s
+Succesfully completed tier: 33
+
+Tier 36 exceeded 1.00s cutoff with time 2.475154s
+Succesfully completed tier: 35
